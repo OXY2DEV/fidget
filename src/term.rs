@@ -1,8 +1,11 @@
-pub fn term_rgb (r: u32, g: u32, b: u32) -> String {
+// Styler for the terminal
+#![allow(dead_code)]
+
+pub fn rgb (r: u32, g: u32, b: u32) -> String {
     format!("\x1b[38;2;{};{};{}m", r, g, b)
 }
 
-pub fn term_hex (hex: &str) -> String {
+pub fn hex (hex: &str) -> String {
     let inner = hex.trim_start_matches("#");
 
     let r: u32;

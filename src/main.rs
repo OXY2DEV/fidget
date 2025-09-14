@@ -4,7 +4,7 @@ use crossterm::{
     execute,
     terminal::{self, Clear, ClearType}
 };
-use std::{io::{stdout, Write}, time::Duration};
+use std::{io::stdout, time::Duration};
 
 mod term;
 
@@ -14,10 +14,10 @@ fn print_help () {
     println!(
         "{}{}Fidget{}{}: {}Fidget spinners for the terminal!",
         term::bold(),
-        term::term_hex("#a6e3a1"),
+        term::hex("#a6e3a1"),
 
         term::reset(),
-        term::term_hex("#9399b2"),
+        term::hex("#9399b2"),
 
         term::reset(),
     );
@@ -29,10 +29,10 @@ fn print_help () {
     println!("");
     println!(
         "   {}fidget {}<command> {}<name> {}...{}",
-        term::term_hex("#89b4fa"),
-        term::term_hex("#eba0ac"),
-        term::term_hex("#f5c2e7"),
-        term::term_hex("#9399b2"),
+        term::hex("#89b4fa"),
+        term::hex("#eba0ac"),
+        term::hex("#f5c2e7"),
+        term::hex("#9399b2"),
 
         term::reset(),
     );
@@ -40,26 +40,26 @@ fn print_help () {
     println!(
         "   {}{}<command>    {}Either {}show{} or {}output{}.",
         term::bold(),
-        term::term_hex("#eba0ac"),
+        term::hex("#eba0ac"),
 
         term::reset(),
 
-        term::term_hex("#cba6f7"),
+        term::hex("#cba6f7"),
         term::reset(),
 
-        term::term_hex("#cba6f7"),
+        term::hex("#cba6f7"),
         term::reset(),
     );
     println!(
         "   {}{}<name>       {}Fidget name",
         term::bold(),
-        term::term_hex("#f5c2e7"),
+        term::hex("#f5c2e7"),
         term::reset(),
     );
     println!(
         "   {}{}...          {}Options",
         term::bold(),
-        term::term_hex("#9399b2"),
+        term::hex("#9399b2"),
         term::reset(),
     );
 
@@ -74,7 +74,7 @@ fn print_help () {
     println!(
         "   {}{}default      {}Basic spinner",
         term::bold(),
-        term::term_hex("#eba0ac"),
+        term::hex("#eba0ac"),
         term::reset(),
     );
 
@@ -107,27 +107,27 @@ fn draw (name: &str) {
         println!(
             "{}Style: {}{}{}{}{}    Frame: {}{}{}{}{}    Total: {}{}{}{}{}    Update: {}{}{}ms{}",
 
-            term::term_hex("#9399b2"),
+            term::hex("#9399b2"),
 
-            term::term_hex("#a6e3a1"),
+            term::hex("#a6e3a1"),
             term::bold(),
             &name,
             term::reset(),
-            term::term_hex("#9399b2"),
+            term::hex("#9399b2"),
 
-            term::term_hex("#fab387"),
+            term::hex("#fab387"),
             term::bold(),
             &index,
             term::reset(),
-            term::term_hex("#9399b2"),
+            term::hex("#9399b2"),
 
-            term::term_hex("#89b4fa"),
+            term::hex("#89b4fa"),
             term::bold(),
             states.len(),
             term::reset(),
-            term::term_hex("#9399b2"),
+            term::hex("#9399b2"),
 
-            term::term_hex("#89dceb"),
+            term::hex("#89dceb"),
             update_delay,
             term::bold(),
             term::reset(),
@@ -137,8 +137,8 @@ fn draw (name: &str) {
         println!(
             "{}╰──╴{}{}{}",
 
-            term::term_hex("#9399b2"),
-            term::term_hex("#cba6f7"),
+            term::hex("#9399b2"),
+            term::hex("#cba6f7"),
             states[_index],
             term::reset(),
         );
