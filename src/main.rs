@@ -188,6 +188,10 @@ impl Fidget {
         let _stat_pad = ((terminal_w - stat_len) / 2) as f32;
         let stat_pad = _stat_pad.floor() as usize;
 
+        let keymap_len = "󰌏  l: Delay+, h: Delay-, j: Next, k; Previous, q: Quit".chars().count() as u16;
+        let _keymap_pad = ((terminal_w - keymap_len) / 2) as f32;
+        let keymap_pad = _keymap_pad.floor() as usize;
+
         execute!(stdout(), MoveToColumn(0)).ok();
         print!(
             "{} 🎨 Style: {}{:<name_size$}{} {}󰸽 {}󰹁 ",
@@ -235,11 +239,44 @@ impl Fidget {
             term::fg("#a6e3a1") + &term::bold(),
             term::fg("#9399b2"),
 
-            term::fg("#cba6f7") + &max.to_string(),
+            term::fg("#cba6f7") + &max.to_string() + &term::reset(),
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!(
-            "l: Next, h: Previous, q: quit",
+            "{:<keymap_pad$}{}󰌏  {}l{}: {}Delay+, {}h{}: {}Delay-, {}j{}: {}Next, {}k{}; {}Previous, {}q{}: {}Quit",
+
+            "",
+            term::fg("#89b4fa"),
+
+
+            term::fg("#fab387") + &term::bold(),
+
+            term::reset() + &term::fg("#9399b2"),
+            term::fg("#a6e3a1"),
+
+
+            term::fg("#fab387") + &term::bold(),
+
+            term::reset() + &term::fg("#9399b2"),
+            term::fg("#a6e3a1"),
+
+
+            term::fg("#fab387") + &term::bold(),
+
+            term::reset() + &term::fg("#9399b2"),
+            term::fg("#a6e3a1"),
+
+
+            term::fg("#fab387") + &term::bold(),
+
+            term::reset() + &term::fg("#9399b2"),
+            term::fg("#a6e3a1"),
+
+
+            term::fg("#fab387") + &term::bold(),
+
+            term::reset() + &term::fg("#9399b2"),
+            term::fg("#a6e3a1"),
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
 
