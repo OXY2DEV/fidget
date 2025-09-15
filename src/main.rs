@@ -170,13 +170,13 @@ impl Fidget {
             Ok(w) => w.0,
             Err(_) => 80
         };
-        let name_size = (terminal_w - (4 + 5 + 9)) as usize;
+        let name_size = (terminal_w - (4 + 5 + 7)) as usize;
         let (at_start, at_end) = self._show_indicator();
         let loader_size = terminal_w as usize;
 
         execute!(stdout(), MoveToColumn(0)).ok();
         print!(
-            "{} 🎨 Style: {}{:<name_size$}{} {} ◀ {} ▶ ",
+            "{} 🎨 Style: {}{:<name_size$}{} {}󰸽 {}󰹁 ",
 
             term::fg("#9399b2"),
             term::fg("#a6e3a1") + &term::bold(),
@@ -184,8 +184,8 @@ impl Fidget {
             &self.item,
 
             term::reset(),
-            if at_start == false { term::bg("#cba6f7") + &term::fg("#1e1e2e") } else { term::bg("#9399b2") + &term::fg("#1e1e2e") },
-            if at_end == false   { term::bg("#cba6f7") + &term::fg("#1e1e2e") } else { term::bg("#9399b2") + &term::fg("#1e1e2e") },
+            if at_end == false   { term::fg("#cba6f7") } else { term::fg("#9399b2") },
+            if at_start == false { term::fg("#cba6f7") } else { term::fg("#9399b2") },
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!(
@@ -213,6 +213,9 @@ impl Fidget {
         execute!(stdout(), cursor::SavePosition, Hide).ok();
 
         let delay: u64 = self.delay as u64;
+
+        println!("");
+        println!("");
 
         self.clear_output();
         self.next_frame();
