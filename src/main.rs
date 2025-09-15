@@ -94,7 +94,7 @@ impl Fidget {
         execute!(
             stdout(),
 
-            MoveUp(3),
+            MoveUp(6),
             Clear(ClearType::FromCursorDown),
         ).ok();
     }
@@ -174,6 +174,20 @@ impl Fidget {
         let (at_start, at_end) = self._show_indicator();
         let loader_size = terminal_w as usize;
 
+        let _frame_count: String = frames.len().to_string();
+        let frame_size = _frame_count.chars().count();
+
+        let stat = format!(
+            "󰄉 Interval: {}ms • 󰕟 Current: {:0frame_size$} • 󰕬 Frames: {}",
+
+            self.delay,
+            self.frame + 1,
+            max
+        );
+        let stat_len = stat.chars().count() as u16;
+        let _stat_pad = ((terminal_w - stat_len) / 2) as f32;
+        let stat_pad = _stat_pad.floor() as usize;
+
         execute!(stdout(), MoveToColumn(0)).ok();
         print!(
             "{} 🎨 Style: {}{:<name_size$}{} {}󰸽 {}󰹁 ",
@@ -188,12 +202,40 @@ impl Fidget {
             if at_start == false { term::fg("#cba6f7") } else { term::fg("#9399b2") },
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
+        print!("");
+        execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!(
             "{}{:^loader_size$}{}",
 
-            term::reset(),
+            term::reset() + &term::fg("#9399b2"),
             current,
             term::reset(),
+        );
+        execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
+        print!("");
+        execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
+        print!(
+            "{:<stat_pad$}{}󰄉 {}Interval: {}ms{} • {}󰕟 {}Current: {}{:0frame_size$}{} • {}󰕬 {}Frames: {}",
+
+            "",
+
+            term::fg("#89b4fa") + &term::bold(),
+            term::fg("#9399b2"),
+
+            term::fg("#fab387") + &self.delay.to_string() + &term::fg("#f9e2af"),
+            term::fg("#9399b2"),
+
+            term::fg("#f5c2e7") + &term::bold(),
+            term::fg("#9399b2"),
+
+            term::fg("#fab387"),
+            self.frame + 1,
+            term::fg("#9399b2"),
+
+            term::fg("#a6e3a1") + &term::bold(),
+            term::fg("#9399b2"),
+
+            term::fg("#cba6f7") + &max.to_string(),
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!(
@@ -212,8 +254,12 @@ impl Fidget {
         println!("");
         execute!(stdout(), cursor::SavePosition, Hide).ok();
 
-        let delay: u64 = self.delay as u64;
+        let mut delay: u64 = self.delay as u64;
 
+        println!("");
+        println!("");
+        println!("");
+        println!("");
         println!("");
         println!("");
 
@@ -234,7 +280,8 @@ impl Fidget {
                         self.clear_output();
                         return;
                     } else if key.code == KeyCode::Char('h') && delay > 100 {
-                        // self.delay -= 50;
+                        self.delay -= 50;
+                        delay -= 50;
 
                         self.clear_output();
                         self.next_frame();
@@ -251,7 +298,8 @@ impl Fidget {
                         self.frame = 0 as usize;
                         self.next_frame();
                     } else if key.code == KeyCode::Char('l') && delay < 1000 {
-                        // self.delay += 50;
+                        self.delay += 50;
+                        delay += 50;
 
                         self.clear_output();
                         self.next_frame();
