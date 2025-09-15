@@ -99,7 +99,7 @@ impl Fidget {
         ).ok();
     }
 
-    fn _show_indicator (&self) -> (bool, bool) {
+    fn _layouts (&self) -> Vec<String> {
         let mut keys: Vec<String> = vec![];
 
         for key in self.items.keys() {
@@ -107,6 +107,37 @@ impl Fidget {
         }
 
         keys.sort();
+        keys
+    }
+
+    fn next_loader (&mut self) {
+        let keys: Vec<String> = self._layouts();
+        let current_index = keys.iter().position(|s| s == &self.item).expect("");
+
+        let _c_index = (current_index + 1) as usize;
+
+        if _c_index < keys.len() {
+            self.item = keys[current_index + 1].to_owned();
+        } else {
+            self.item = keys[0].to_owned();
+        }
+    }
+
+    fn prev_loader (&mut self) {
+        let keys: Vec<String> = self._layouts();
+        let current_index = keys.iter().position(|s| s == &self.item).expect("");
+
+        let _c_index = (current_index + 1) as usize;
+
+        if _c_index > 1 {
+            self.item = keys[current_index - 1].to_owned();
+        } else {
+            self.item = keys[keys.len()].to_owned();
+        }
+    }
+
+    fn _show_indicator (&self) -> (bool, bool) {
+        let keys: Vec<String> = self._layouts();
 
         let mut at_start = false;
         let mut at_end = false;
@@ -203,6 +234,18 @@ impl Fidget {
                         // self.delay -= 50;
 
                         self.clear_output();
+                        self.next_frame();
+                    } else if key.code == KeyCode::Char('j') {
+                        self.next_loader();
+                        self.clear_output();
+
+                        self.frame = 0 as usize;
+                        self.next_frame();
+                    } else if key.code == KeyCode::Char('k') {
+                        self.prev_loader();
+                        self.clear_output();
+
+                        self.frame = 0 as usize;
                         self.next_frame();
                     } else if key.code == KeyCode::Char('l') && delay < 1000 {
                         // self.delay += 50;
