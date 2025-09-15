@@ -1,213 +1,282 @@
 use crossterm::{
-    cursor::{Hide, MoveToColumn, MoveUp, Show}, 
+    cursor::{self, Hide, MoveDown, MoveToColumn, MoveUp, Show}, 
     event::{self, Event, KeyCode, KeyModifiers},
     execute,
     terminal::{self, Clear, ClearType}
 };
-use std::{io::stdout, time::Duration};
+use std::{collections::HashMap, io::stdout, time::Duration};
 
 mod term;
 
-/// Show the help message.
-fn print_help () {
-    println!("");
-    println!(
-        "{}{}Fidget{}{}: {}Fidget spinners for the terminal!",
-        term::bold(),
-        term::hex("#a6e3a1"),
+/// Fidget CLI
+struct Fidget {
+    delay: u32,
+    items: HashMap<String, Vec<String>>,
+    item: String,
 
-        term::reset(),
-        term::hex("#9399b2"),
-
-        term::reset(),
-    );
-
-    //|fS "chunk: Arguments"
-
-    println!("");
-    println!("Usage,");
-    println!("");
-    println!(
-        "   {}fidget {}<command> {}<name> {}...{}",
-        term::hex("#89b4fa"),
-        term::hex("#eba0ac"),
-        term::hex("#f5c2e7"),
-        term::hex("#9399b2"),
-
-        term::reset(),
-    );
-    println!("");
-    println!(
-        "   {}{}<command>    {}Either {}show{} or {}output{}.",
-        term::bold(),
-        term::hex("#eba0ac"),
-
-        term::reset(),
-
-        term::hex("#cba6f7"),
-        term::reset(),
-
-        term::hex("#cba6f7"),
-        term::reset(),
-    );
-    println!(
-        "   {}{}<name>       {}Fidget name",
-        term::bold(),
-        term::hex("#f5c2e7"),
-        term::reset(),
-    );
-    println!(
-        "   {}{}...          {}Options",
-        term::bold(),
-        term::hex("#9399b2"),
-        term::reset(),
-    );
-
-    //|fE
-
-    //|fS "chunk: Fidget names"
-
-    println!("");
-    println!("Fidget names,");
-    println!("");
-
-    println!(
-        "   {}{}default      {}Basic spinner",
-        term::bold(),
-        term::hex("#eba0ac"),
-        term::reset(),
-    );
-
-    //|fE
+    frame: usize,
 }
 
-//////////////////////////////////////////////////////////////////////////////
+impl Fidget {
+    fn help (&self) {
+        println!("");
+        println!(
+            "{}{}Fidget{}{}: {}Fidget spinners for the terminal!",
+            term::bold(),
+            term::fg("#a6e3a1"),
 
-fn draw (name: &str) {
-    fn clear () {
+            term::reset(),
+            term::fg("#9399b2"),
+
+            term::reset(),
+        );
+
+        //|fS "chunk: Arguments"
+
+        println!("");
+        println!("Usage,");
+        println!("");
+        println!(
+            "   {}fidget {}<command> {}<name> {}...{}",
+            term::fg("#89b4fa"),
+            term::fg("#eba0ac"),
+            term::fg("#f5c2e7"),
+            term::fg("#9399b2"),
+
+            term::reset(),
+        );
+        println!("");
+        println!(
+            "   {}{}<command>    {}Either {}show{} or {}output{}.",
+            term::bold(),
+            term::fg("#eba0ac"),
+
+            term::reset(),
+
+            term::fg("#cba6f7"),
+            term::reset(),
+
+            term::fg("#cba6f7"),
+            term::reset(),
+        );
+        println!(
+            "   {}{}<name>       {}Fidget name",
+            term::bold(),
+            term::fg("#f5c2e7"),
+            term::reset(),
+        );
+        println!(
+            "   {}{}...          {}Options",
+            term::bold(),
+            term::fg("#9399b2"),
+            term::reset(),
+        );
+
+        //|fE
+
+        //|fS "chunk: Fidget names"
+
+        println!("");
+        println!("Fidget names,");
+        println!("");
+
+        println!(
+            "   {}{}default      {}Basic spinner",
+            term::bold(),
+            term::fg("#eba0ac"),
+            term::reset(),
+        );
+
+        //|fE
+    }
+
+    fn clear_output (&self) {
         execute!(
             stdout(),
 
-            MoveUp(2),
-            Clear(ClearType::FromCursorDown)
+            MoveUp(3),
+            Clear(ClearType::FromCursorDown),
         ).ok();
     }
 
-    fn draw (name: &str, states: &Vec<&str>, mut index: u32, update_delay: u32) -> u32 {
-        let mut _index = (index + 1) as usize;
+    fn _show_indicator (&self) -> (bool, bool) {
+        let mut keys: Vec<String> = vec![];
 
-        if _index >= states.len() {
-            index = 0;
-            _index = 0_usize;
-        } else {
-            index += 1;
+        for key in self.items.keys() {
+            keys.push(key.into());
         }
 
-        execute!(stdout(),MoveToColumn(0)).ok();
-        println!(
-            "{}Style: {}{}{}{}{}    Frame: {}{}{}{}{}    Total: {}{}{}{}{}    Update: {}{}{}ms{}",
+        keys.sort();
 
-            term::hex("#9399b2"),
+        let mut at_start = false;
+        let mut at_end = false;
 
-            term::hex("#a6e3a1"),
-            term::bold(),
-            &name,
-            term::reset(),
-            term::hex("#9399b2"),
+        let mut _current_index = 1;
 
-            term::hex("#fab387"),
-            term::bold(),
-            &index,
-            term::reset(),
-            term::hex("#9399b2"),
+        for key in keys.iter() {
+            if key == &self.item {
+                if _current_index == 1 {
+                    at_start = true;
+                } else if _current_index as usize == keys.len() {
+                    at_end = true;
+                }
 
-            term::hex("#89b4fa"),
-            term::bold(),
-            states.len(),
-            term::reset(),
-            term::hex("#9399b2"),
+                break;
+            }
 
-            term::hex("#89dceb"),
-            update_delay,
-            term::bold(),
-            term::reset(),
-        );
+            _current_index += 1;
+        }
+
+        (at_start, at_end)
+    }
+
+    fn next_frame (&mut self) {
+        let frames = &self.items[&self.item];
+        let max = frames.len();
+
+        let current = &frames[self.frame];
+        let terminal_w: u16 = match terminal::size() {
+            Ok(w) => w.0,
+            Err(_) => 80
+        };
+        let name_size = (terminal_w - (4 + 5 + 9)) as usize;
+        let (at_start, at_end) = self._show_indicator();
+        let loader_size = terminal_w as usize;
 
         execute!(stdout(), MoveToColumn(0)).ok();
-        println!(
-            "{}╰──╴{}{}{}",
+        print!(
+            "{} 🎨 Style: {}{:<name_size$}{} {} ◀ {} ▶ ",
 
-            term::hex("#9399b2"),
-            term::hex("#cba6f7"),
-            states[_index],
+            term::fg("#9399b2"),
+            term::fg("#a6e3a1") + &term::bold(),
+
+            &self.item,
+
+            term::reset(),
+            if at_start == false { term::bg("#cba6f7") + &term::fg("#1e1e2e") } else { term::bg("#9399b2") + &term::fg("#1e1e2e") },
+            if at_end == false   { term::bg("#cba6f7") + &term::fg("#1e1e2e") } else { term::bg("#9399b2") + &term::fg("#1e1e2e") },
+        );
+        execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
+        print!(
+            "{}{:^loader_size$}{}",
+
+            term::reset(),
+            current,
             term::reset(),
         );
+        execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
+        print!(
+            "l: Next, h: Previous, q: quit",
+        );
+        execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
 
-        index
-    }
-
-    let states = match name {
-        "default" => vec![ "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", " " ],
-        "loader" => vec![ "[----]", "[=---]", "[==--]", "[===-]", "[====]" ],
-        _ => vec![]
-    };
-
-    if states.len() == 0 {
-        return;
-    }
-
-    execute!(stdout(), Hide).ok();
-    println!("");
-
-    let mut update_delay = 100;
-    let mut frame = draw(name, &states, 0, update_delay);
-
-    loop {
-        if event::poll(Duration::from_millis(update_delay as u64)).unwrap() {
-            if let Event::Key(key) = event::read().unwrap() {
-                if key.code == KeyCode::Char('d') && key.modifiers == KeyModifiers::CONTROL {
-                    execute!(stdout(), Show).ok();
-                    return;
-                } else if key.code == KeyCode::Char('q') {
-                    execute!(stdout(), Show).ok();
-                    return;
-                } else if key.code == KeyCode::Char('h') && update_delay > 100 {
-                    update_delay -= 50;
-
-                    clear();
-                    frame = draw(name, &states, frame, update_delay);
-                } else if key.code == KeyCode::Char('l') && update_delay < 1000 {
-                    update_delay += 50;
-
-                    clear();
-                    frame = draw(name, &states, frame, update_delay);
-                } else {
-                    clear();
-                    frame = draw(name, &states, frame, update_delay);
-                }
-            }
+        if self.frame + 1 < max {
+            self.frame += 1;
         } else {
-            clear();
-            frame = draw(name, &states, frame, update_delay);
+            self.frame = 0;
+        }
+    }
+
+    fn show (&mut self) {
+        println!("");
+        execute!(stdout(), cursor::SavePosition, Hide).ok();
+
+        let delay: u64 = self.delay as u64;
+
+        self.clear_output();
+        self.next_frame();
+
+        loop {
+            //|fS "chunk: Main loop"
+
+            if event::poll(Duration::from_millis(delay)).unwrap() {
+                if let Event::Key(key) = event::read().unwrap() {
+                    if key.code == KeyCode::Char('d') && key.modifiers == KeyModifiers::CONTROL {
+                        execute!(stdout(), Show).ok();
+                        self.clear_output();
+                        return;
+                    } else if key.code == KeyCode::Char('q') {
+                        execute!(stdout(), Show).ok();
+                        self.clear_output();
+                        return;
+                    } else if key.code == KeyCode::Char('h') && delay > 100 {
+                        // self.delay -= 50;
+
+                        self.clear_output();
+                        self.next_frame();
+                    } else if key.code == KeyCode::Char('l') && delay < 1000 {
+                        // self.delay += 50;
+
+                        self.clear_output();
+                        self.next_frame();
+                    } else {
+                        self.clear_output();
+                        self.next_frame();
+                    }
+                }
+            } else {
+                self.clear_output();
+                self.next_frame();
+            }
+
+            //|fE
         }
     }
 }
 
 fn main() -> std::io::Result<()> {
-    terminal::enable_raw_mode()?;
-
     let mut args = std::env::args();
     let fidget_name: String = match args.nth(1) {
         Some(n) => n,
         None => String::from("")
     };
+    let loaders = HashMap::from([
+        ("default".into(), vec![
+            "▁".into(),
+            "▂".into(),
+            "▃".into(),
+            "▄".into(),
+            "▅".into(),
+            "▆".into(),
+            "▇".into(),
+            "█".into(),
+            " ".into()
+        ]),
+        ("loader".into(), vec![
+            "[----]".into(),
+            "[=---]".into(),
+            "[==--]".into(),
+            "[===-]".into(),
+            "[====]".into()
+        ]),
+        ("shaded".into(), vec![
+            "▒▒▒▒▒▒▒▒▒▒".into(),
+            "█▒▒▒▒▒▒▒▒▒".into(),
+            "██▒▒▒▒▒▒▒▒".into(),
+            "███▒▒▒▒▒▒▒".into(),
+            "████▒▒▒▒▒▒".into(),
+            "█████▒▒▒▒▒".into(),
+            "██████▒▒▒▒".into(),
+            "███████▒▒▒".into(),
+            "████████▒▒".into(),
+            "█████████▒".into(),
+            "██████████".into(),
+        ]),
+    ]);
+    let mut fd = Fidget {
+        delay: 100,
+        frame: 0,
+        item: fidget_name.to_owned(),
+        items: loaders
+    };
 
     if fidget_name == "" {
-        print_help();
+        fd.help();
     } else {
-        draw(&fidget_name);
+        terminal::enable_raw_mode()?;
+        fd.show();
+        terminal::disable_raw_mode()?;
     }
 
-    terminal::disable_raw_mode()?;
     Ok(())
 }
