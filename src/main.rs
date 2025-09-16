@@ -7,17 +7,19 @@ use crossterm::{
 use std::{collections::HashMap, io::stdout, time::Duration};
 
 mod term;
+mod args;
+mod json;
 
 /// Fidget CLI
-struct Fidget<'a> {
-    delay: u32,
-    items: HashMap<String, Vec<&'a str>>,
-    item: String,
+struct Fidget {
+    interval: u32,
+    items: HashMap<String, Vec<String>>,
+    pick: String,
 
     frame: usize,
 }
 
-impl<'a> Fidget<'a> {
+impl Fidget {
     fn help (&self) {
         println!("");
         println!(
@@ -112,27 +114,27 @@ impl<'a> Fidget<'a> {
 
     fn next_loader (&mut self) {
         let keys: Vec<String> = self._layouts();
-        let current_index = keys.iter().position(|s| s == &self.item).expect("");
+        let current_index = keys.iter().position(|s| s == &self.pick).expect("");
 
         let _c_index = (current_index + 1) as usize;
 
         if _c_index < keys.len() {
-            self.item = keys[current_index + 1].to_owned();
+            self.pick = keys[current_index + 1].to_owned();
         } else {
-            self.item = keys[0].to_owned();
+            self.pick = keys[0].to_owned();
         }
     }
 
     fn prev_loader (&mut self) {
         let keys: Vec<String> = self._layouts();
-        let current_index = keys.iter().position(|s| s == &self.item).expect("");
+        let current_index = keys.iter().position(|s| s == &self.pick).expect("");
 
         let _c_index = (current_index + 1) as usize;
 
         if _c_index > 1 {
-            self.item = keys[current_index - 1].to_owned();
+            self.pick = keys[current_index - 1].to_owned();
         } else {
-            self.item = keys[keys.len() - 1].to_owned();
+            self.pick = keys[keys.len() - 1].to_owned();
         }
     }
 
@@ -145,7 +147,7 @@ impl<'a> Fidget<'a> {
         let mut _current_index = 1;
 
         for key in keys.iter() {
-            if key == &self.item {
+            if key == &self.pick {
                 if _current_index == 1 {
                     at_start = true;
                 } else if _current_index as usize == keys.len() {
@@ -162,7 +164,7 @@ impl<'a> Fidget<'a> {
     }
 
     fn next_frame (&mut self) {
-        let frames = &self.items[&self.item];
+        let frames = &self.items[&self.pick];
         let max = frames.len();
 
         let current = &frames[self.frame];
@@ -180,7 +182,7 @@ impl<'a> Fidget<'a> {
         let stat = format!(
             "󰄉 Interval: {}ms • 󰕟 Current: {:0frame_size$} • 󰕬 Frames: {}",
 
-            self.delay,
+            self.interval,
             self.frame + 1,
             max
         );
@@ -200,7 +202,7 @@ impl<'a> Fidget<'a> {
             term::fg("#9399b2"),
             term::fg("#89b4fa") + &term::bold(),
 
-            &self.item,
+            &self.pick,
 
             term::reset(),
             if !at_end    { term::fg("#cba6f7") } else { term::fg("#9399b2") },
@@ -227,7 +229,7 @@ impl<'a> Fidget<'a> {
             term::fg("#89b4fa") + &term::bold(),
             term::fg("#9399b2"),
 
-            term::fg("#fab387") + &self.delay.to_string() + &term::fg("#f9e2af"),
+            term::fg("#fab387") + &self.interval.to_string() + &term::fg("#f9e2af"),
             term::fg("#9399b2"),
 
             term::fg("#f5c2e7") + &term::bold(),
@@ -292,7 +294,7 @@ impl<'a> Fidget<'a> {
         println!("");
         execute!(stdout(), cursor::SavePosition, Hide).ok();
 
-        let mut delay: u64 = self.delay as u64;
+        let mut interval: u64 = self.interval as u64;
 
         println!("");
         println!("");
@@ -307,7 +309,7 @@ impl<'a> Fidget<'a> {
         loop {
             //|fS "chunk: Main loop"
 
-            if event::poll(Duration::from_millis(delay)).unwrap() {
+            if event::poll(Duration::from_millis(interval)).unwrap() {
                 if let Event::Key(key) = event::read().unwrap() {
                     if key.code == KeyCode::Char('d') && key.modifiers == KeyModifiers::CONTROL {
                         execute!(stdout(), Show).ok();
@@ -317,9 +319,9 @@ impl<'a> Fidget<'a> {
                         execute!(stdout(), Show).ok();
                         self.clear_output();
                         return;
-                    } else if key.code == KeyCode::Char('h') && delay > 100 {
-                        self.delay -= 50;
-                        delay -= 50;
+                    } else if key.code == KeyCode::Char('h') && interval > 100 {
+                        self.interval -= 50;
+                        interval -= 50;
 
                         self.clear_output();
                         self.next_frame();
@@ -335,9 +337,9 @@ impl<'a> Fidget<'a> {
 
                         self.frame = 0_usize;
                         self.next_frame();
-                    } else if key.code == KeyCode::Char('l') && delay < 1000 {
-                        self.delay += 50;
-                        delay += 50;
+                    } else if key.code == KeyCode::Char('l') && interval < 1000 {
+                        self.interval += 50;
+                        interval += 50;
 
                         self.clear_output();
                         self.next_frame();
@@ -357,49 +359,86 @@ impl<'a> Fidget<'a> {
 }
 
 fn main() -> std::io::Result<()> {
-    let mut args = std::env::args();
-    let fidget_name: String = args.nth(1).unwrap_or_default();
-    let loaders = HashMap::from([
-        ("default".into(), vec![
-            "▁",
-            "▂",
-            "▃",
-            "▄",
-            "▅",
-            "▆",
-            "▇",
-            "█",
-            " "
-        ]),
-        ("loader".into(), vec![
-            "[----]",
-            "[=---]",
-            "[==--]",
-            "[===-]",
-            "[====]"
-        ]),
-        ("shaded".into(), vec![
-            "▒▒▒▒▒▒▒▒▒▒",
-            "█▒▒▒▒▒▒▒▒▒",
-            "██▒▒▒▒▒▒▒▒",
-            "███▒▒▒▒▒▒▒",
-            "████▒▒▒▒▒▒",
-            "█████▒▒▒▒▒",
-            "██████▒▒▒▒",
-            "███████▒▒▒",
-            "████████▒▒",
-            "█████████▒",
-            "██████████",
-        ]),
-    ]);
+    let config = args::get_config();
+    let fidgets = json::read_config(config.source);
+
+    // let loaders = HashMap::from([
+    //     ("default".into(), vec![
+    //         "▁",
+    //         "▂",
+    //         "▃",
+    //         "▄",
+    //         "▅",
+    //         "▆",
+    //         "▇",
+    //         "█",
+    //         " "
+    //     ]),
+    //     ("loader".into(), vec![
+    //         "[----]",
+    //         "[=---]",
+    //         "[==--]",
+    //         "[===-]",
+    //         "[====]"
+    //     ]),
+    //     ("shaded".into(), vec![
+    //         "▒▒▒▒▒▒▒▒▒▒",
+    //         "█▒▒▒▒▒▒▒▒▒",
+    //         "██▒▒▒▒▒▒▒▒",
+    //         "███▒▒▒▒▒▒▒",
+    //         "████▒▒▒▒▒▒",
+    //         "█████▒▒▒▒▒",
+    //         "██████▒▒▒▒",
+    //         "███████▒▒▒",
+    //         "████████▒▒",
+    //         "█████████▒",
+    //         "██████████",
+    //     ]),
+    //     ("spread".into(), vec![
+    //         "◈",
+    //         "╴◈╶",
+    //         "─╴◈╶─",
+    //         "──╴◈╶──",
+    //         "───╴◈╶───",
+    //         "────╴◈╶────",
+    //         "─────╴◈╶─────",
+    //         "──────╴◈╶──────",
+    //         "─────╴◈╶─────",
+    //         "────╴◈╶────",
+    //         "───╴◈╶───",
+    //         "──╴◈╶──",
+    //         "─╴◈╶─",
+    //         "╴◈╶",
+    //     ]),
+    //     ("retro".into(), vec![
+    //         "▱▱▱▱▱▱▱▱▱▱",
+    //         "▰▱▱▱▱▱▱▱▱▱",
+    //         "▰▰▱▱▱▱▱▱▱▱",
+    //         "▰▰▰▱▱▱▱▱▱▱",
+    //         "▰▰▰▰▱▱▱▱▱▱",
+    //         "▰▰▰▰▰▱▱▱▱▱",
+    //         "▰▰▰▰▰▰▱▱▱▱",
+    //         "▰▰▰▰▰▰▰▱▱▱",
+    //         "▰▰▰▰▰▰▰▰▱▱",
+    //         "▰▰▰▰▰▰▰▰▰▱",
+    //         "▰▰▰▰▰▰▰▰▰▰",
+    //     ]),
+    // ]);
     let mut fd = Fidget {
-        delay: 100,
+        interval: match config.interval {
+            Some(v) => v,
+            None => 100,
+        },
+
         frame: 0,
-        item: fidget_name.to_owned(),
-        items: loaders
+        pick: match config.name {
+            Some(v) => v,
+            None => "default".to_owned(),
+        },
+        items: fidgets
     };
 
-    if fidget_name.is_empty() {
+    if config.show_help != None {
         fd.help();
     } else {
         terminal::enable_raw_mode()?;
