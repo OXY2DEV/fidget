@@ -9,15 +9,15 @@ use std::{collections::HashMap, io::stdout, time::Duration};
 mod term;
 
 /// Fidget CLI
-struct Fidget {
+struct Fidget<'a> {
     delay: u32,
-    items: HashMap<String, Vec<String>>,
+    items: HashMap<String, Vec<&'a str>>,
     item: String,
 
     frame: usize,
 }
 
-impl Fidget {
+impl<'a> Fidget<'a> {
     fn help (&self) {
         println!("");
         println!(
@@ -198,7 +198,7 @@ impl Fidget {
 
             term::fg("#cba6f7"),
             term::fg("#9399b2"),
-            term::fg("#a6e3a1") + &term::bold(),
+            term::fg("#89b4fa") + &term::bold(),
 
             &self.item,
 
@@ -361,35 +361,35 @@ fn main() -> std::io::Result<()> {
     let fidget_name: String = args.nth(1).unwrap_or_default();
     let loaders = HashMap::from([
         ("default".into(), vec![
-            "▁".into(),
-            "▂".into(),
-            "▃".into(),
-            "▄".into(),
-            "▅".into(),
-            "▆".into(),
-            "▇".into(),
-            "█".into(),
-            " ".into()
+            "▁",
+            "▂",
+            "▃",
+            "▄",
+            "▅",
+            "▆",
+            "▇",
+            "█",
+            " "
         ]),
         ("loader".into(), vec![
-            "[----]".into(),
-            "[=---]".into(),
-            "[==--]".into(),
-            "[===-]".into(),
-            "[====]".into()
+            "[----]",
+            "[=---]",
+            "[==--]",
+            "[===-]",
+            "[====]"
         ]),
         ("shaded".into(), vec![
-            "▒▒▒▒▒▒▒▒▒▒".into(),
-            "█▒▒▒▒▒▒▒▒▒".into(),
-            "██▒▒▒▒▒▒▒▒".into(),
-            "███▒▒▒▒▒▒▒".into(),
-            "████▒▒▒▒▒▒".into(),
-            "█████▒▒▒▒▒".into(),
-            "██████▒▒▒▒".into(),
-            "███████▒▒▒".into(),
-            "████████▒▒".into(),
-            "█████████▒".into(),
-            "██████████".into(),
+            "▒▒▒▒▒▒▒▒▒▒",
+            "█▒▒▒▒▒▒▒▒▒",
+            "██▒▒▒▒▒▒▒▒",
+            "███▒▒▒▒▒▒▒",
+            "████▒▒▒▒▒▒",
+            "█████▒▒▒▒▒",
+            "██████▒▒▒▒",
+            "███████▒▒▒",
+            "████████▒▒",
+            "█████████▒",
+            "██████████",
         ]),
     ]);
     let mut fd = Fidget {
