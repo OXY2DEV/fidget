@@ -132,7 +132,7 @@ impl Fidget {
         if _c_index > 1 {
             self.item = keys[current_index - 1].to_owned();
         } else {
-            self.item = keys[keys.len()].to_owned();
+            self.item = keys[keys.len() - 1].to_owned();
         }
     }
 
@@ -170,7 +170,7 @@ impl Fidget {
             Ok(w) => w.0,
             Err(_) => 80
         };
-        let name_size = (terminal_w - (4 + 5 + 7)) as usize;
+        let name_size = (terminal_w - (3 + 5 + 7)) as usize;
         let (at_start, at_end) = self._show_indicator();
         let loader_size = terminal_w as usize;
 
@@ -194,16 +194,17 @@ impl Fidget {
 
         execute!(stdout(), MoveToColumn(0)).ok();
         print!(
-            "{} 🎨 Style: {}{:<name_size$}{} {}󰸽 {}󰹁 ",
+            "{} 󰢵 {}Style: {}{:<name_size$}{} {}󰸽 {}󰹁 ",
 
+            term::fg("#cba6f7"),
             term::fg("#9399b2"),
             term::fg("#a6e3a1") + &term::bold(),
 
             &self.item,
 
             term::reset(),
-            if at_end == false   { term::fg("#cba6f7") } else { term::fg("#9399b2") },
-            if at_start == false { term::fg("#cba6f7") } else { term::fg("#9399b2") },
+            if !at_end    { term::fg("#cba6f7") } else { term::fg("#9399b2") },
+            if !at_start  { term::fg("#cba6f7") } else { term::fg("#9399b2") },
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!("");
@@ -326,13 +327,13 @@ impl Fidget {
                         self.next_loader();
                         self.clear_output();
 
-                        self.frame = 0 as usize;
+                        self.frame = 0_usize;
                         self.next_frame();
                     } else if key.code == KeyCode::Char('k') {
                         self.prev_loader();
                         self.clear_output();
 
-                        self.frame = 0 as usize;
+                        self.frame = 0_usize;
                         self.next_frame();
                     } else if key.code == KeyCode::Char('l') && delay < 1000 {
                         self.delay += 50;
@@ -357,10 +358,7 @@ impl Fidget {
 
 fn main() -> std::io::Result<()> {
     let mut args = std::env::args();
-    let fidget_name: String = match args.nth(1) {
-        Some(n) => n,
-        None => String::from("")
-    };
+    let fidget_name: String = args.nth(1).unwrap_or_default();
     let loaders = HashMap::from([
         ("default".into(), vec![
             "▁".into(),
@@ -401,7 +399,7 @@ fn main() -> std::io::Result<()> {
         items: loaders
     };
 
-    if fidget_name == "" {
+    if fidget_name.is_empty() {
         fd.help();
     } else {
         terminal::enable_raw_mode()?;
