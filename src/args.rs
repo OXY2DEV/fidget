@@ -1,6 +1,11 @@
+use crate::export;
+
 #[derive(Debug)]
 pub struct FidgetConfig {
     pub show_help: Option<bool>,
+    pub export_as: Option<export::FidgetExport>,
+    pub multi_line: Option<bool>,
+    pub quote: Option<char>,
 
     pub source: Option<String>,
     pub pick: Option<String>,
@@ -14,6 +19,9 @@ pub fn get_config () -> FidgetConfig {
 
     let mut config: FidgetConfig = FidgetConfig {
         show_help: None,
+        export_as: None,
+        multi_line: None,
+        quote: None,
 
         source: None,
         pick: None,
@@ -37,6 +45,31 @@ pub fn get_config () -> FidgetConfig {
                 config.source = Some(parts[1].to_owned());
             } else if parts[0] == "pick" {
                 config.pick = Some(parts[1].to_owned());
+            } else if parts[0] == "multiline" {
+                config.multi_line = match parts[1].parse::<bool>() {
+                    Ok(v) => Some(v),
+                    Err(_) => None
+                };
+            } else if parts[0] == "quote" {
+                config.quote = match parts[1].parse::<char>() {
+                    Ok(v) => Some(v),
+                    Err(_) => None
+                };
+            } else if parts[0] == "export" {
+                match parts[1] {
+                    "list" => {
+                        config.export_as = Some(export::FidgetExport::List);
+                    },
+                    "array" => {
+                        config.export_as = Some(export::FidgetExport::Array);
+                    },
+                    "string" => {
+                        config.export_as = Some(export::FidgetExport::String);
+                    },
+                    _ => {}
+                };
+
+                // config.export_as = Some(parts[1].to_owned());
             }
         } else if item.starts_with("-") && item.contains('=') {
             let parts: Vec<&str> = item.trim_start_matches("-").split('=').collect();
@@ -50,6 +83,29 @@ pub fn get_config () -> FidgetConfig {
                 config.source = Some(parts[1].to_owned());
             } else if parts[0] == "p" {
                 config.pick = Some(parts[1].to_owned());
+            } else if parts[0] == "m" {
+                config.multi_line = match parts[1].parse::<bool>() {
+                    Ok(v) => Some(v),
+                    Err(_) => None
+                };
+            } else if parts[0] == "q" {
+                config.quote = match parts[1].parse::<char>() {
+                    Ok(v) => Some(v),
+                    Err(_) => None
+                };
+            } else if parts[0] == "e" {
+                match parts[1] {
+                    "l" => {
+                        config.export_as = Some(export::FidgetExport::List);
+                    },
+                    "a" => {
+                        config.export_as = Some(export::FidgetExport::Array);
+                    },
+                    "s" => {
+                        config.export_as = Some(export::FidgetExport::String);
+                    },
+                    _ => {}
+                };
             }
         } else if item == "--help" || item == "-h" {
             config.show_help = Some(true);

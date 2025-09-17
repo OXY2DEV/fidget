@@ -9,14 +9,18 @@ use std::{collections::HashMap, io::stdout, time::Duration};
 mod term;
 mod args;
 mod json;
+mod export;
 
 /// Fidget CLI
 struct Fidget {
     interval: u32,
-    items: HashMap<String, Vec<String>>,
     pick: String,
-
     frame: usize,
+    export: Option<export::FidgetExport>,
+    multi_line: Option<bool>,
+    quote: char,
+
+    items: HashMap<String, Vec<String>>,
 }
 
 impl Fidget {
@@ -90,6 +94,17 @@ impl Fidget {
         );
 
         //|fE
+    }
+
+    fn export (&self) {
+        if self.export.is_none() {
+            return;
+        }
+
+        let _as = self.export.as_ref().unwrap_or_else(|| &export::FidgetExport::List);
+        let _ml = self.multi_line.as_ref().unwrap_or_else(|| &true);
+
+        export::export(_as, &self.quote, _ml, &self.items[&self.pick]);
     }
 
     fn clear_output (&self) {
@@ -369,11 +384,18 @@ fn main() -> std::io::Result<()> {
         },
 
         frame: 0,
-        pick: match config.name {
+        pick: match config.pick {
             Some(v) => v,
             None => "default".to_owned(),
         },
-        items: fidgets
+        items: fidgets,
+
+        export: config.export_as,
+        multi_line: config.multi_line,
+        quote: match config.quote {
+            Some(v) => v,
+            None => '"',
+        }
     };
 
     if config.show_help != None {
@@ -384,5 +406,11 @@ fn main() -> std::io::Result<()> {
         terminal::disable_raw_mode()?;
     }
 
+    print!(
+        "{}",
+        term::fg("#9399b2"),
+    );
+
+    fd.export();
     Ok(())
 }
