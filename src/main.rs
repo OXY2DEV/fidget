@@ -11,23 +11,23 @@ mod args;
 mod json;
 mod export;
 
-/// Fidget CLI
-struct Fidget {
+/// Spinn CLI
+struct Spinn {
     interval: u32,
     pick: String,
     frame: usize,
-    export: Option<export::FidgetExport>,
+    export: Option<export::SpinnExport>,
     multi_line: Option<bool>,
     quote: char,
 
     items: HashMap<String, Vec<String>>,
 }
 
-impl Fidget {
+impl Spinn {
     fn help (&self) {
         println!("");
         println!(
-            "{}{}Fidget{}{}: {}Fidget spinners for the terminal!",
+            "{}{}Spinn{}{}: {}Spinners for the terminal!",
             term::bold(),
             term::fg("#a6e3a1"),
 
@@ -43,7 +43,7 @@ impl Fidget {
         println!("Usage,");
         println!("");
         println!(
-            "   {}fidget {}<command> {}<name> {}...{}",
+            "   {}spinn {}<command> {}<name> {}...{}",
             term::fg("#89b4fa"),
             term::fg("#eba0ac"),
             term::fg("#f5c2e7"),
@@ -66,7 +66,7 @@ impl Fidget {
             term::reset(),
         );
         println!(
-            "   {}{}<name>       {}Fidget name",
+            "   {}{}<name>       {}Spinner name",
             term::bold(),
             term::fg("#f5c2e7"),
             term::reset(),
@@ -80,10 +80,10 @@ impl Fidget {
 
         //|fE
 
-        //|fS "chunk: Fidget names"
+        //|fS "chunk: Spinner names"
 
         println!("");
-        println!("Fidget names,");
+        println!("Spinner names,");
         println!("");
 
         println!(
@@ -101,7 +101,7 @@ impl Fidget {
             return;
         }
 
-        let _as = self.export.as_ref().unwrap_or_else(|| &export::FidgetExport::List);
+        let _as = self.export.as_ref().unwrap_or_else(|| &export::SpinnExport::List);
         let _ml = self.multi_line.as_ref().unwrap_or_else(|| &true);
 
         export::export(_as, &self.quote, _ml, &self.items[&self.pick]);
@@ -375,9 +375,9 @@ impl Fidget {
 
 fn main() -> std::io::Result<()> {
     let config = args::get_config();
-    let fidgets = json::read_config(config.source);
+    let spinners = json::read_config(config.source);
 
-    let mut fd = Fidget {
+    let mut fd = Spinn {
         interval: match config.interval {
             Some(v) => v,
             None => 100,
@@ -388,7 +388,7 @@ fn main() -> std::io::Result<()> {
             Some(v) => v,
             None => "default".to_owned(),
         },
-        items: fidgets,
+        items: spinners,
 
         export: config.export_as,
         multi_line: config.multi_line,

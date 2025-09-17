@@ -1,9 +1,9 @@
 use crate::export;
 
 #[derive(Debug)]
-pub struct FidgetConfig {
+pub struct SpinnConfig {
     pub show_help: Option<bool>,
-    pub export_as: Option<export::FidgetExport>,
+    pub export_as: Option<export::SpinnExport>,
     pub multi_line: Option<bool>,
     pub quote: Option<char>,
 
@@ -13,11 +13,11 @@ pub struct FidgetConfig {
     pub name: Option<String>
 }
 
-pub fn get_config () -> FidgetConfig {
+pub fn get_config () -> SpinnConfig {
     let mut args: Vec<String> = std::env::args().collect();
     args.remove(0);
 
-    let mut config: FidgetConfig = FidgetConfig {
+    let mut config: SpinnConfig = SpinnConfig {
         show_help: None,
         export_as: None,
         multi_line: None,
@@ -58,13 +58,13 @@ pub fn get_config () -> FidgetConfig {
             } else if parts[0] == "export" {
                 match parts[1] {
                     "list" => {
-                        config.export_as = Some(export::FidgetExport::List);
+                        config.export_as = Some(export::SpinnExport::List);
                     },
                     "array" => {
-                        config.export_as = Some(export::FidgetExport::Array);
+                        config.export_as = Some(export::SpinnExport::Array);
                     },
                     "string" => {
-                        config.export_as = Some(export::FidgetExport::String);
+                        config.export_as = Some(export::SpinnExport::String);
                     },
                     _ => {}
                 };
@@ -96,13 +96,13 @@ pub fn get_config () -> FidgetConfig {
             } else if parts[0] == "e" {
                 match parts[1] {
                     "l" => {
-                        config.export_as = Some(export::FidgetExport::List);
+                        config.export_as = Some(export::SpinnExport::List);
                     },
                     "a" => {
-                        config.export_as = Some(export::FidgetExport::Array);
+                        config.export_as = Some(export::SpinnExport::Array);
                     },
                     "s" => {
-                        config.export_as = Some(export::FidgetExport::String);
+                        config.export_as = Some(export::SpinnExport::String);
                     },
                     _ => {}
                 };

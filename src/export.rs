@@ -1,19 +1,19 @@
 #[derive(Debug)]
-pub enum FidgetExport {
+pub enum SpinnExport {
     List,
     Array,
     String,
 }
 
-pub fn export (export_as: &FidgetExport, quote: &char, multiline: &bool, frames: &Vec<String>) {
+pub fn export (export_as: &SpinnExport, quote: &char, multiline: &bool, frames: &Vec<String>) {
     match export_as {
-        FidgetExport::List => {
+        SpinnExport::List => {
             as_list(multiline, quote, frames);
         },
-        FidgetExport::Array => {
+        SpinnExport::Array => {
             as_array(multiline, quote, frames);
         },
-        FidgetExport::String => {
+        SpinnExport::String => {
             as_string(multiline, quote, frames);
         }
     };
