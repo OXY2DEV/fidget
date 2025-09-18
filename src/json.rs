@@ -4,7 +4,7 @@ use serde_json;
 type SpinnJSON = HashMap<String, Vec<String>>;
 
 pub fn read_config (source: Option<String>) -> SpinnJSON {
-    let default_path = format!("{}/fidget.json", env!("CARGO_MANIFEST_DIR"));
+    let default_path = format!("{}/spinners.json", env!("CARGO_MANIFEST_DIR"));
     let default_config_txt: String = match fs::read_to_string(default_path) {
         Ok(v) => v,
         Err(_) => "{}".to_owned()
