@@ -27,73 +27,167 @@ impl Spinn {
     fn help (&self) {
         println!("");
         println!(
-            "{}{}Spinn{}{}: {}Spinners for the terminal!",
-            term::bold(),
-            term::fg("#a6e3a1"),
-
-            term::reset(),
-            term::fg("#9399b2"),
-
-            term::reset(),
-        );
-
-        //|fS "chunk: Arguments"
-
-        println!("");
-        println!("Usage,");
-        println!("");
-        println!(
-            "   {}spinn {}<command> {}<name> {}...{}",
-            term::fg("#89b4fa"),
-            term::fg("#eba0ac"),
-            term::fg("#f5c2e7"),
-            term::fg("#9399b2"),
-
-            term::reset(),
-        );
-        println!("");
-        println!(
-            "   {}{}<command>    {}Either {}show{} or {}output{}.",
-            term::bold(),
-            term::fg("#eba0ac"),
-
-            term::reset(),
-
-            term::fg("#cba6f7"),
-            term::reset(),
-
-            term::fg("#cba6f7"),
-            term::reset(),
+            "{} {}",
+            term::color(35) + env!("CARGO_PKG_NAME"),
+            term::bold() + &term::color(33) + "v" + env!("CARGO_PKG_VERSION") + &term::reset(),
         );
         println!(
-            "   {}{}<name>       {}Spinner name",
-            term::bold(),
-            term::fg("#f5c2e7"),
+            "{}Spinners for the terminal!{}",
+            term::bold() + &term::color(2),
             term::reset(),
         );
-        println!(
-            "   {}{}...          {}Options",
-            term::bold(),
-            term::fg("#9399b2"),
-            term::reset(),
-        );
-
-        //|fE
-
-        //|fS "chunk: Spinner names"
 
         println!("");
-        println!("Spinner names,");
-        println!("");
-
         println!(
-            "   {}{}default      {}Basic spinner",
-            term::bold(),
-            term::fg("#eba0ac"),
+            "{}Usage:{} {}spinn-rs {}<args>",
+            term::underlined() + &term::color(32),
             term::reset(),
+
+            term::bold() + &term::color(34),
+            term::reset() + &term::color(31),
         );
 
-        //|fE
+        println!("");
+        println!(
+            "{}Arguments:{}",
+            term::underlined() + &term::color(32),
+            term::reset(),
+        );
+        println!("");
+
+        let arg_col_size = 20;
+        let mut args = Vec::new();
+
+        args.push(
+            (
+                format!(
+                    "{}--export={}<as>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 13),
+                ),
+                format!(
+                    "Export format. See {}Expprt options{}.",
+                    term::underlined() + &term::color(32),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}--interval={}<ms>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 15),
+                ),
+                format!(
+                    "Interval between each frame in {}miliseconds{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}--multiline={}<bool>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 18),
+                ),
+                format!(
+                    "Whether to export the output in {}multiple lines{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}--quote={}<char>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 14),
+                ),
+                format!(
+                    "Text to use for {}quoting{} strings when exporting.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}--source={}<path>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 15),
+                ),
+                format!(
+                    "Path to a {}JSON{} file containing spinners.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+
+        for (k, v) in args {
+            println!("  {}    {}{}", k, term::color(97), v);
+        }
+
+        println!("");
+        println!(
+            "{}Spiners:{}",
+            term::underlined() + &term::color(32),
+            term::reset(),
+        );
+        println!("");
+
+        for (name, frames) in &self.items {
+            let max = frames.len() as f32;
+
+            let _mid: f32 = max / 2.0;
+            let mid = _mid.floor() as usize;
+
+            let as_text = format!("{}", frames[mid]);
+
+            println!(
+                "  {}{:<arg_col_size$}    {}{}",
+
+                term::color(33),
+                name,
+
+                term::color(97),
+                as_text
+            );
+        }
+
+        println!("");
+        println!(
+            "{}Export options:{}",
+            term::underlined() + &term::color(32),
+            term::reset(),
+        );
+        println!("");
+
+        let mut export_format = Vec::new();
+        export_format.push(
+            ( "array", "{ \"a\", \"b\", \"c\" }" )
+        );
+        export_format.push(
+            ( "list", "[ \"a\", \"b\", \"c\" ]" )
+        );
+        export_format.push(
+            ( "string", "a b c" )
+        );
+
+        for (k, v) in export_format {
+            println!("  {}{:<arg_col_size$}    {}{}", term::color(33), k, term::color(97), v);
+        }
+
     }
 
     fn export (&self) {

@@ -5,6 +5,10 @@ pub fn rgb (r: u32, g: u32, b: u32) -> String {
     format!("\x1b[38;2;{};{};{}m", r, g, b)
 }
 
+pub fn color (n: u32) -> String {
+    format!("\x1b[{}m", n)
+}
+
 pub fn bg (hex: &str) -> String {
     let inner = hex.trim_start_matches("#");
 
@@ -68,3 +72,4 @@ pub fn bold () -> String { "\x1b[1m".to_string() }
 
 /// Hello
 pub fn italic () -> String { "\x1b[3m".to_string() }
+pub fn underlined () -> String { "\x1b[4m".to_string() }

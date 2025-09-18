@@ -10,7 +10,6 @@ pub struct SpinnConfig {
     pub source: Option<String>,
     pub pick: Option<String>,
     pub interval: Option<u32>,
-    pub name: Option<String>
 }
 
 pub fn get_config () -> SpinnConfig {
@@ -26,7 +25,6 @@ pub fn get_config () -> SpinnConfig {
         source: None,
         pick: None,
         interval: None,
-        name: None,
     };
     let mut position = 0;
 
@@ -43,8 +41,6 @@ pub fn get_config () -> SpinnConfig {
                 };
             } else if parts[0] == "source" {
                 config.source = Some(parts[1].to_owned());
-            } else if parts[0] == "pick" {
-                config.pick = Some(parts[1].to_owned());
             } else if parts[0] == "multiline" {
                 config.multi_line = match parts[1].parse::<bool>() {
                     Ok(v) => Some(v),
@@ -81,8 +77,6 @@ pub fn get_config () -> SpinnConfig {
                 };
             } else if parts[0] == "s" {
                 config.source = Some(parts[1].to_owned());
-            } else if parts[0] == "p" {
-                config.pick = Some(parts[1].to_owned());
             } else if parts[0] == "m" {
                 config.multi_line = match parts[1].parse::<bool>() {
                     Ok(v) => Some(v),
@@ -110,8 +104,8 @@ pub fn get_config () -> SpinnConfig {
         } else if item == "--help" || item == "-h" {
             config.show_help = Some(true);
             break;
-        } else if config.name == None {
-            config.name = Some(item.to_owned());
+        } else {
+            config.pick = Some(item.to_owned());
         }
 
         position += 1;
