@@ -307,15 +307,15 @@ impl Spinn {
         print!(
             "{} 󰢵 {}Style: {}{:<name_size$}{} {}󰸽 {}󰹁 ",
 
-            term::fg("#cba6f7"),
-            term::fg("#9399b2"),
-            term::fg("#89b4fa") + &term::bold(),
+            term::color(32),
+            term::color(97),
+            term::color(34) + &term::bold(),
 
             &self.pick,
 
             term::reset(),
-            if !at_end    { term::fg("#cba6f7") } else { term::fg("#9399b2") },
-            if !at_start  { term::fg("#cba6f7") } else { term::fg("#9399b2") },
+            if !at_end    { term::color(32) } else { term::color(97) },
+            if !at_start  { term::color(32) } else { term::color(97) },
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!("");
@@ -323,7 +323,7 @@ impl Spinn {
         print!(
             "{}{:^loader_size$}{}",
 
-            term::reset() + &term::fg("#9399b2"),
+            term::reset() + &term::color(97),
             current,
             term::reset(),
         );
@@ -335,60 +335,60 @@ impl Spinn {
 
             "",
 
-            term::fg("#89b4fa") + &term::bold(),
-            term::fg("#9399b2"),
+            term::color(34) + &term::bold(),
+            term::color(97),
 
-            term::fg("#fab387") + &self.interval.to_string() + &term::fg("#f9e2af"),
-            term::fg("#9399b2"),
+            term::color(36) + &self.interval.to_string() + &term::color(33),
+            term::color(97),
 
-            term::fg("#f5c2e7") + &term::bold(),
-            term::fg("#9399b2"),
+            term::color(35) + &term::bold(),
+            term::color(97),
 
-            term::fg("#fab387"),
+            term::color(36),
             self.frame + 1,
-            term::fg("#9399b2"),
+            term::color(97),
 
-            term::fg("#a6e3a1") + &term::bold(),
-            term::fg("#9399b2"),
+            term::color(32) + &term::bold(),
+            term::color(97),
 
-            term::fg("#cba6f7") + &max.to_string() + &term::reset(),
+            term::color(37) + &max.to_string() + &term::reset(),
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
         print!(
             "{:<keymap_pad$}{}󰌏  {}l{}: {}Delay+, {}h{}: {}Delay-, {}j{}: {}Next, {}k{}; {}Previous, {}q{}: {}Quit",
 
             "",
-            term::fg("#89b4fa"),
+            term::color(34),
 
 
-            term::fg("#fab387") + &term::bold(),
+            term::color(36) + &term::bold(),
 
-            term::reset() + &term::fg("#9399b2"),
-            term::fg("#a6e3a1"),
-
-
-            term::fg("#fab387") + &term::bold(),
-
-            term::reset() + &term::fg("#9399b2"),
-            term::fg("#a6e3a1"),
+            term::reset() + &term::color(97),
+            term::color(32),
 
 
-            term::fg("#fab387") + &term::bold(),
+            term::color(36) + &term::bold(),
 
-            term::reset() + &term::fg("#9399b2"),
-            term::fg("#a6e3a1"),
-
-
-            term::fg("#fab387") + &term::bold(),
-
-            term::reset() + &term::fg("#9399b2"),
-            term::fg("#a6e3a1"),
+            term::reset() + &term::color(97),
+            term::color(32),
 
 
-            term::fg("#fab387") + &term::bold(),
+            term::color(36) + &term::bold(),
 
-            term::reset() + &term::fg("#9399b2"),
-            term::fg("#a6e3a1"),
+            term::reset() + &term::color(97),
+            term::color(32),
+
+
+            term::color(36) + &term::bold(),
+
+            term::reset() + &term::color(97),
+            term::color(32),
+
+
+            term::color(36) + &term::bold(),
+
+            term::reset() + &term::color(97),
+            term::color(32),
         );
         execute!(stdout(), MoveDown(1), MoveToColumn(0)).ok();
 
@@ -502,7 +502,7 @@ fn main() -> std::io::Result<()> {
 
     print!(
         "{}",
-        term::fg("#9399b2"),
+        term::color(97),
     );
 
     fd.export();
