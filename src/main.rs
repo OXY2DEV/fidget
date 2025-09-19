@@ -39,11 +39,12 @@ impl Spinn {
 
         println!("");
         println!(
-            "{}Usage:{} {}spinn-rs {}<args>",
+            "{}Usage:{} {}spinn-rs {}<spinner_name> {}<args>",
             term::underlined() + &term::color(32),
             term::reset(),
 
             term::bold() + &term::color(34),
+            term::reset() + &term::color(33),
             term::reset() + &term::color(31),
         );
 
@@ -68,6 +69,20 @@ impl Spinn {
                 ),
                 format!(
                     "Export format. See {}Expprt options{}.",
+                    term::underlined() + &term::color(32),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}--help{}",
+                    term::color(33),
+                    term::reset() + &" ".repeat(arg_col_size - 6),
+                ),
+                format!(
+                    "Shows {}this message{}.",
                     term::underlined() + &term::color(32),
                     term::reset() + &term::color(97),
                 )
@@ -133,6 +148,96 @@ impl Spinn {
                 )
             )
         );
+        args.push((String::new(), String::new()));
+        args.push(
+            (
+                format!(
+                    "{}-e={}<as>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 7),
+                ),
+                format!(
+                    "Alias for {}--export{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}-h{}",
+                    term::color(33),
+                    term::reset() + &" ".repeat(arg_col_size - 2),
+                ),
+                format!(
+                    "Alias for {}--help{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}-i={}<ms>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 7),
+                ),
+                format!(
+                    "Alias for {}--interval{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}-m={}<bool>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 9),
+                ),
+                format!(
+                    "Alias for {}--multiline{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}-q={}<char>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 9),
+                ),
+                format!(
+                    "Alias for {}--quote{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
+        args.push(
+            (
+                format!(
+                    "{}-s={}<path>{}",
+                    term::color(33),
+                    term::color(36),
+                    term::reset() + &" ".repeat(arg_col_size - 9),
+                ),
+                format!(
+                    "Alias for {}--source{}.",
+                    term::color(33),
+                    term::reset() + &term::color(97),
+                )
+            )
+        );
 
         for (k, v) in args {
             println!("  {}    {}{}", k, term::color(97), v);
@@ -182,6 +287,16 @@ impl Spinn {
         );
         export_format.push(
             ( "string", "a b c" )
+        );
+        export_format.push(( "", "" ));
+        export_format.push(
+            ( "a", "Alias for 'array'" )
+        );
+        export_format.push(
+            ( "l", "Alias for 'list'" )
+        );
+        export_format.push(
+            ( "s", "Alias for 'string'" )
         );
 
         for (k, v) in export_format {
