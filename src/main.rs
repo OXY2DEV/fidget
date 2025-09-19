@@ -492,7 +492,25 @@ fn main() -> std::io::Result<()> {
         }
     };
 
-    if config.show_help != None {
+    // Invalid item pick
+    if fd.items.contains_key(&fd.pick) == false {
+        if let Some(random_key) = fd.items.keys().next() {
+            println!(
+                "{}Error: Spinner not found! A random one has been picked instead.",
+                term::color(31)
+            );
+            fd.pick = random_key.to_owned();
+        } else {
+            println!(
+                "{}Warn: No spinner found! Pleass provide at least 1 spinner.",
+                term::color(31)
+            );
+            fd.help();
+            return Ok(());
+        }
+    }
+
+    if fd.items.keys().len() == 0 || config.show_help != None {
         fd.help();
     } else {
         terminal::enable_raw_mode()?;
