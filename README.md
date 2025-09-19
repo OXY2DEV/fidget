@@ -1,8 +1,9 @@
 # 🍃 Spinn-rs
 
+https://github.com/user-attachments/assets/fd921e48-fdfe-441d-bada-ebf83a419e6c
+
 ![demo 1](./assets/spinn-rs_preview.png)
 ![demo 2](./assets/spinn-rs_export.png)
-![demo 3](./assets/spinn-rs_help.png)
 
 Spinn-rs(Spinners) is a simple rust project for navigating, exporting and playing TUI loading animations(also called spinners).
 
