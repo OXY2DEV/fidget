@@ -1,5 +1,9 @@
 # 🍃 Spinn-rs
 
+![demo 1](./assets/spinn-rs_preview.png)
+![demo 2](./assets/spinn-rs_export.png)
+![demo 3](./assets/spinn-rs_help.png)
+
 Spinn-rs(Spinners) is a simple rust project for navigating, exporting and playing TUI loading animations(also called spinners).
 
 ## ⭐ Features
@@ -19,4 +23,36 @@ Spinn-rs(Spinners) is a simple rust project for navigating, exporting and playin
 
 >[!TIP]
 > You can use `cargo run -- -h` for viewing all the flags, export formats etc..
+
+## 🧩 Commands
+
+```txt
+Usage: spinn-rs <spinner_name> <args>
+
+Arguments:
+
+  --export=<as>           Export format. See Expprt options.
+  --help                  Shows this message.
+  --interval=<ms>         Interval between each frame in miliseconds.
+  --multiline=<bool>      Whether to export the output in multiple lines.
+  --quote=<char>          Text to use for quoting strings when exporting.
+  --source=<path>         Path to a JSON file containing spinners.
+      
+  -e=<as>                 Alias for --export.
+  -h                      Alias for --help.
+  -i=<ms>                 Alias for --interval.
+  -m=<bool>               Alias for --multiline.
+  -q=<char>               Alias for --quote.
+  -s=<path>               Alias for --source.
+
+Export options:
+
+  array                   { "a", "b", "c" }
+  list                    [ "a", "b", "c" ]
+  string                  a b c
+                          
+  a                       Alias for 'array'
+  l                       Alias for 'list'
+  s                       Alias for 'string'
+```
 
